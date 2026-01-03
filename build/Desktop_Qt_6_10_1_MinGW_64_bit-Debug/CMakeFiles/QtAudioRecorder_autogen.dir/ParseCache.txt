@@ -421,7 +421,7 @@ C:/Users/berka/OneDrive/Belgeler/untitled/mainwindow.h
  mdp:C:/Users/berka/OneDrive/Belgeler/untitled/build/Desktop_Qt_6_10_1_MinGW_64_bit-Debug/QtAudioRecorder_autogen/moc_predefs.h
  mdp:C:/Users/berka/OneDrive/Belgeler/untitled/mainwindow.h
 C:/Users/berka/OneDrive/Belgeler/untitled/server/voiceserver.h
-C:/Users/berka/OneDrive/Belgeler/untitled/main.cpp
 C:/Users/berka/OneDrive/Belgeler/untitled/mainwindow.cpp
  uic:./ui_mainwindow.h
+C:/Users/berka/OneDrive/Belgeler/untitled/main.cpp
 C:/Users/berka/OneDrive/Belgeler/untitled/server/voiceserver.cpp
