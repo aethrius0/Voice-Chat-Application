@@ -132,7 +132,7 @@ CMAKE_INSTALL_MANDIR:PATH=
 CMAKE_INSTALL_OLDINCLUDEDIR:PATH=/usr/include
 
 //Install path prefix, prepended onto install directories.
-CMAKE_INSTALL_PREFIX:PATH=C:/Program Files (x86)/untitled
+CMAKE_INSTALL_PREFIX:PATH=C:/Program Files (x86)/QtAudioRecorder
 
 //Run-time variable data (LOCALSTATEDIR/run)
 CMAKE_INSTALL_RUNSTATEDIR:PATH=
@@ -378,15 +378,6 @@ Vulkan_LIBRARY:FILEPATH=Vulkan_LIBRARY-NOTFOUND
 
 //Path to a program.
 WINDEPLOYQT_EXECUTABLE:FILEPATH=C:/Qt/6.10.1/mingw_64/bin/windeployqt.exe
-
-//Value Computed by CMake
-untitled_BINARY_DIR:STATIC=C:/Users/berka/OneDrive/Belgeler/untitled/build/Desktop_Qt_6_10_1_MinGW_64_bit-Debug
-
-//Value Computed by CMake
-untitled_IS_TOP_LEVEL:STATIC=ON
-
-//Value Computed by CMake
-untitled_SOURCE_DIR:STATIC=C:/Users/berka/OneDrive/Belgeler/untitled
 
 
 ########################
@@ -1518,5 +1509,5 @@ Vulkan_LIBRARY-ADVANCED:INTERNAL=1
 //linker supports push/pop state
 _CMAKE_LINKER_PUSHPOP_STATE_SUPPORTED:INTERNAL=TRUE
 //CMAKE_INSTALL_PREFIX during last run
-_GNUInstallDirs_LAST_CMAKE_INSTALL_PREFIX:INTERNAL=C:/Program Files (x86)/untitled
+_GNUInstallDirs_LAST_CMAKE_INSTALL_PREFIX:INTERNAL=C:/Program Files (x86)/QtAudioRecorder
 

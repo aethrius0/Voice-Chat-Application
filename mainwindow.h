@@ -13,6 +13,8 @@
 // NETWORK
 #include <QUdpSocket>
 #include <QHostAddress>
+#include <QRandomGenerator>
+#include <QTimer>
 
 // IO
 #include <QIODevice>
@@ -38,6 +40,9 @@ private slots:
     void onUdpReadyRead();   // gelen datagramları okuyacağımız slot
     void onAudioReadyRead(); // mikrofondan yeni ses geldiğinde
 
+    void on_onlineButton_clicked();
+    void sendKeepAlive();
+
 private:
     Ui::MainWindow *ui;
 
@@ -51,8 +56,14 @@ private:
     QUdpSocket   *m_udpSocket     = nullptr;
     QHostAddress  m_remoteAddress;
     quint16       m_remotePort    = 0;
+    quint16       m_localPort     = 0;
 
     bool          m_isStreaming   = false;
+    bool          m_isOnline = false;
+
+    // KEEPALIVE
+    QTimer       *m_keepAliveTimer = nullptr;
+
 };
 
 #endif // MAINWINDOW_H

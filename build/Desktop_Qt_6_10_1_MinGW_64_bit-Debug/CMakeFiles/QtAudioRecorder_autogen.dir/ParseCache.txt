@@ -2,6 +2,8 @@
 C:/Users/berka/OneDrive/Belgeler/untitled/mainwindow.h
  mmc:Q_OBJECT
  mdp:C:/Qt/6.10.1/mingw_64/include/QtCore/QIODevice
+ mdp:C:/Qt/6.10.1/mingw_64/include/QtCore/QRandomGenerator
+ mdp:C:/Qt/6.10.1/mingw_64/include/QtCore/QTimer
  mdp:C:/Qt/6.10.1/mingw_64/include/QtCore/q17memory.h
  mdp:C:/Qt/6.10.1/mingw_64/include/QtCore/q20functional.h
  mdp:C:/Qt/6.10.1/mingw_64/include/QtCore/q20iterator.h
@@ -10,6 +12,7 @@ C:/Users/berka/OneDrive/Belgeler/untitled/mainwindow.h
  mdp:C:/Qt/6.10.1/mingw_64/include/QtCore/q20utility.h
  mdp:C:/Qt/6.10.1/mingw_64/include/QtCore/q23type_traits.h
  mdp:C:/Qt/6.10.1/mingw_64/include/QtCore/q23utility.h
+ mdp:C:/Qt/6.10.1/mingw_64/include/QtCore/qabstracteventdispatcher.h
  mdp:C:/Qt/6.10.1/mingw_64/include/QtCore/qalgorithms.h
  mdp:C:/Qt/6.10.1/mingw_64/include/QtCore/qalloc.h
  mdp:C:/Qt/6.10.1/mingw_64/include/QtCore/qanystringview.h
@@ -20,6 +23,7 @@ C:/Users/berka/OneDrive/Belgeler/untitled/mainwindow.h
  mdp:C:/Qt/6.10.1/mingw_64/include/QtCore/qatomic.h
  mdp:C:/Qt/6.10.1/mingw_64/include/QtCore/qatomic_cxx11.h
  mdp:C:/Qt/6.10.1/mingw_64/include/QtCore/qbasicatomic.h
+ mdp:C:/Qt/6.10.1/mingw_64/include/QtCore/qbasictimer.h
  mdp:C:/Qt/6.10.1/mingw_64/include/QtCore/qbindingstorage.h
  mdp:C:/Qt/6.10.1/mingw_64/include/QtCore/qbytearray.h
  mdp:C:/Qt/6.10.1/mingw_64/include/QtCore/qbytearrayalgorithms.h
@@ -39,8 +43,10 @@ C:/Users/berka/OneDrive/Belgeler/untitled/mainwindow.h
  mdp:C:/Qt/6.10.1/mingw_64/include/QtCore/qcontiguouscache.h
  mdp:C:/Qt/6.10.1/mingw_64/include/QtCore/qdarwinhelpers.h
  mdp:C:/Qt/6.10.1/mingw_64/include/QtCore/qdatastream.h
+ mdp:C:/Qt/6.10.1/mingw_64/include/QtCore/qdeadlinetimer.h
  mdp:C:/Qt/6.10.1/mingw_64/include/QtCore/qdebug.h
  mdp:C:/Qt/6.10.1/mingw_64/include/QtCore/qendian.h
+ mdp:C:/Qt/6.10.1/mingw_64/include/QtCore/qeventloop.h
  mdp:C:/Qt/6.10.1/mingw_64/include/QtCore/qexceptionhandling.h
  mdp:C:/Qt/6.10.1/mingw_64/include/QtCore/qflags.h
  mdp:C:/Qt/6.10.1/mingw_64/include/QtCore/qfloat16.h
@@ -77,6 +83,7 @@ C:/Users/berka/OneDrive/Belgeler/untitled/mainwindow.h
  mdp:C:/Qt/6.10.1/mingw_64/include/QtCore/qpair.h
  mdp:C:/Qt/6.10.1/mingw_64/include/QtCore/qpoint.h
  mdp:C:/Qt/6.10.1/mingw_64/include/QtCore/qprocessordetection.h
+ mdp:C:/Qt/6.10.1/mingw_64/include/QtCore/qrandom.h
  mdp:C:/Qt/6.10.1/mingw_64/include/QtCore/qrect.h
  mdp:C:/Qt/6.10.1/mingw_64/include/QtCore/qrefcount.h
  mdp:C:/Qt/6.10.1/mingw_64/include/QtCore/qscopedpointer.h
@@ -114,6 +121,7 @@ C:/Users/berka/OneDrive/Belgeler/untitled/mainwindow.h
  mdp:C:/Qt/6.10.1/mingw_64/include/QtCore/qtenvironmentvariables.h
  mdp:C:/Qt/6.10.1/mingw_64/include/QtCore/qtextstream.h
  mdp:C:/Qt/6.10.1/mingw_64/include/QtCore/qtformat_impl.h
+ mdp:C:/Qt/6.10.1/mingw_64/include/QtCore/qtimer.h
  mdp:C:/Qt/6.10.1/mingw_64/include/QtCore/qtmetamacros.h
  mdp:C:/Qt/6.10.1/mingw_64/include/QtCore/qtnoop.h
  mdp:C:/Qt/6.10.1/mingw_64/include/QtCore/qtpreprocessorsupport.h
@@ -236,6 +244,8 @@ C:/Users/berka/OneDrive/Belgeler/untitled/mainwindow.h
  mdp:C:/Qt/Tools/mingw1310_64/lib/gcc/x86_64-w64-mingw32/13.1.0/include/c++/bits/postypes.h
  mdp:C:/Qt/Tools/mingw1310_64/lib/gcc/x86_64-w64-mingw32/13.1.0/include/c++/bits/predefined_ops.h
  mdp:C:/Qt/Tools/mingw1310_64/lib/gcc/x86_64-w64-mingw32/13.1.0/include/c++/bits/ptr_traits.h
+ mdp:C:/Qt/Tools/mingw1310_64/lib/gcc/x86_64-w64-mingw32/13.1.0/include/c++/bits/random.h
+ mdp:C:/Qt/Tools/mingw1310_64/lib/gcc/x86_64-w64-mingw32/13.1.0/include/c++/bits/random.tcc
  mdp:C:/Qt/Tools/mingw1310_64/lib/gcc/x86_64-w64-mingw32/13.1.0/include/c++/bits/range_access.h
  mdp:C:/Qt/Tools/mingw1310_64/lib/gcc/x86_64-w64-mingw32/13.1.0/include/c++/bits/refwrap.h
  mdp:C:/Qt/Tools/mingw1310_64/lib/gcc/x86_64-w64-mingw32/13.1.0/include/c++/bits/requires_hosted.h
@@ -321,6 +331,7 @@ C:/Users/berka/OneDrive/Belgeler/untitled/mainwindow.h
  mdp:C:/Qt/Tools/mingw1310_64/lib/gcc/x86_64-w64-mingw32/13.1.0/include/c++/pstl/glue_memory_defs.h
  mdp:C:/Qt/Tools/mingw1310_64/lib/gcc/x86_64-w64-mingw32/13.1.0/include/c++/pstl/glue_numeric_defs.h
  mdp:C:/Qt/Tools/mingw1310_64/lib/gcc/x86_64-w64-mingw32/13.1.0/include/c++/pstl/pstl_config.h
+ mdp:C:/Qt/Tools/mingw1310_64/lib/gcc/x86_64-w64-mingw32/13.1.0/include/c++/random
  mdp:C:/Qt/Tools/mingw1310_64/lib/gcc/x86_64-w64-mingw32/13.1.0/include/c++/ratio
  mdp:C:/Qt/Tools/mingw1310_64/lib/gcc/x86_64-w64-mingw32/13.1.0/include/c++/set
  mdp:C:/Qt/Tools/mingw1310_64/lib/gcc/x86_64-w64-mingw32/13.1.0/include/c++/stdexcept
@@ -358,13 +369,20 @@ C:/Users/berka/OneDrive/Belgeler/untitled/mainwindow.h
  mdp:C:/Qt/Tools/mingw1310_64/lib/gcc/x86_64-w64-mingw32/13.1.0/include/c++/x86_64-w64-mingw32/bits/error_constants.h
  mdp:C:/Qt/Tools/mingw1310_64/lib/gcc/x86_64-w64-mingw32/13.1.0/include/c++/x86_64-w64-mingw32/bits/gthr-default.h
  mdp:C:/Qt/Tools/mingw1310_64/lib/gcc/x86_64-w64-mingw32/13.1.0/include/c++/x86_64-w64-mingw32/bits/gthr.h
+ mdp:C:/Qt/Tools/mingw1310_64/lib/gcc/x86_64-w64-mingw32/13.1.0/include/c++/x86_64-w64-mingw32/bits/opt_random.h
  mdp:C:/Qt/Tools/mingw1310_64/lib/gcc/x86_64-w64-mingw32/13.1.0/include/c++/x86_64-w64-mingw32/bits/os_defines.h
+ mdp:C:/Qt/Tools/mingw1310_64/lib/gcc/x86_64-w64-mingw32/13.1.0/include/emmintrin.h
  mdp:C:/Qt/Tools/mingw1310_64/lib/gcc/x86_64-w64-mingw32/13.1.0/include/limits.h
+ mdp:C:/Qt/Tools/mingw1310_64/lib/gcc/x86_64-w64-mingw32/13.1.0/include/mm_malloc.h
+ mdp:C:/Qt/Tools/mingw1310_64/lib/gcc/x86_64-w64-mingw32/13.1.0/include/mmintrin.h
+ mdp:C:/Qt/Tools/mingw1310_64/lib/gcc/x86_64-w64-mingw32/13.1.0/include/mwaitintrin.h
+ mdp:C:/Qt/Tools/mingw1310_64/lib/gcc/x86_64-w64-mingw32/13.1.0/include/pmmintrin.h
  mdp:C:/Qt/Tools/mingw1310_64/lib/gcc/x86_64-w64-mingw32/13.1.0/include/stdarg.h
  mdp:C:/Qt/Tools/mingw1310_64/lib/gcc/x86_64-w64-mingw32/13.1.0/include/stdbool.h
  mdp:C:/Qt/Tools/mingw1310_64/lib/gcc/x86_64-w64-mingw32/13.1.0/include/stddef.h
  mdp:C:/Qt/Tools/mingw1310_64/lib/gcc/x86_64-w64-mingw32/13.1.0/include/stdint.h
  mdp:C:/Qt/Tools/mingw1310_64/lib/gcc/x86_64-w64-mingw32/13.1.0/include/syslimits.h
+ mdp:C:/Qt/Tools/mingw1310_64/lib/gcc/x86_64-w64-mingw32/13.1.0/include/xmmintrin.h
  mdp:C:/Qt/Tools/mingw1310_64/x86_64-w64-mingw32/include/_mingw.h
  mdp:C:/Qt/Tools/mingw1310_64/x86_64-w64-mingw32/include/_mingw_mac.h
  mdp:C:/Qt/Tools/mingw1310_64/x86_64-w64-mingw32/include/_mingw_off_t.h
@@ -402,6 +420,8 @@ C:/Users/berka/OneDrive/Belgeler/untitled/mainwindow.h
  mdp:C:/Qt/Tools/mingw1310_64/x86_64-w64-mingw32/include/wchar.h
  mdp:C:/Users/berka/OneDrive/Belgeler/untitled/build/Desktop_Qt_6_10_1_MinGW_64_bit-Debug/QtAudioRecorder_autogen/moc_predefs.h
  mdp:C:/Users/berka/OneDrive/Belgeler/untitled/mainwindow.h
+C:/Users/berka/OneDrive/Belgeler/untitled/server/voiceserver.h
+C:/Users/berka/OneDrive/Belgeler/untitled/main.cpp
 C:/Users/berka/OneDrive/Belgeler/untitled/mainwindow.cpp
  uic:./ui_mainwindow.h
-C:/Users/berka/OneDrive/Belgeler/untitled/main.cpp
+C:/Users/berka/OneDrive/Belgeler/untitled/server/voiceserver.cpp

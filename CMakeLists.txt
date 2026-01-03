@@ -13,6 +13,9 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets Multimedia Network)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets Multimedia Network)
 
+#Boost.Asio
+include_directories("C:/local/boost_1_89_0_b1")
+
 # 🔹 Projenin kaynak dosyaları
 set(PROJECT_SOURCES
     main.cpp
@@ -26,6 +29,8 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
     qt_add_executable(QtAudioRecorder
         MANUAL_FINALIZATION
         ${PROJECT_SOURCES}
+
+        server/voiceserver.cpp server/voiceserver.h
     )
 else()
     add_executable(QtAudioRecorder
@@ -39,7 +44,16 @@ target_link_libraries(QtAudioRecorder
         Qt${QT_VERSION_MAJOR}::Widgets
         Qt${QT_VERSION_MAJOR}::Multimedia
         Qt${QT_VERSION_MAJOR}::Network
+        ws2_32
 )
+
+add_executable(VoiceServerEXE
+    server/voiceserver_main.cpp
+    server/voiceserver.cpp
+    server/voiceserver.h
+)
+
+target_link_libraries(VoiceServerEXE PRIVATE ws2_32)
 
 set_target_properties(QtAudioRecorder PROPERTIES
     MACOSX_BUNDLE TRUE

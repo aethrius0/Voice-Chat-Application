@@ -1,5 +1,8 @@
 C:/Users/berka/OneDrive/Belgeler/untitled/build/Desktop_Qt_6_10_1_MinGW_64_bit-Debug/CMakeFiles/QtAudioRecorder.dir
+C:/Users/berka/OneDrive/Belgeler/untitled/build/Desktop_Qt_6_10_1_MinGW_64_bit-Debug/CMakeFiles/VoiceServerEXE.dir
 C:/Users/berka/OneDrive/Belgeler/untitled/build/Desktop_Qt_6_10_1_MinGW_64_bit-Debug/CMakeFiles/edit_cache.dir
 C:/Users/berka/OneDrive/Belgeler/untitled/build/Desktop_Qt_6_10_1_MinGW_64_bit-Debug/CMakeFiles/rebuild_cache.dir
 C:/Users/berka/OneDrive/Belgeler/untitled/build/Desktop_Qt_6_10_1_MinGW_64_bit-Debug/CMakeFiles/QtAudioRecorder_autogen_timestamp_deps.dir
 C:/Users/berka/OneDrive/Belgeler/untitled/build/Desktop_Qt_6_10_1_MinGW_64_bit-Debug/CMakeFiles/QtAudioRecorder_autogen.dir
+C:/Users/berka/OneDrive/Belgeler/untitled/build/Desktop_Qt_6_10_1_MinGW_64_bit-Debug/CMakeFiles/VoiceServerEXE_autogen_timestamp_deps.dir
+C:/Users/berka/OneDrive/Belgeler/untitled/build/Desktop_Qt_6_10_1_MinGW_64_bit-Debug/CMakeFiles/VoiceServerEXE_autogen.dir

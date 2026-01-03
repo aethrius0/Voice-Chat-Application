@@ -5,6 +5,9 @@ if("${CONFIG}" STREQUAL "" OR "${CONFIG}" STREQUAL "Debug")
   file(REMOVE_RECURSE
   "CMakeFiles\\QtAudioRecorder_autogen.dir\\AutogenUsed.txt"
   "CMakeFiles\\QtAudioRecorder_autogen.dir\\ParseCache.txt"
+  "CMakeFiles\\VoiceServerEXE_autogen.dir\\AutogenUsed.txt"
+  "CMakeFiles\\VoiceServerEXE_autogen.dir\\ParseCache.txt"
   "QtAudioRecorder_autogen"
+  "VoiceServerEXE_autogen"
   )
 endif()

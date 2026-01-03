@@ -2,6 +2,7 @@
 #include "./ui_mainwindow.h"
 
 #include <QDebug>
+#include <QMessageBox>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -9,11 +10,12 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
 
-    //---- SES AYARLARI ----
-
-    // Başlangıçta buton durumu
-    ui->recordButton->setEnabled(true);
+    // Başlangıçta offline - butonlar disabled
+    m_isOnline = false;
+    ui->recordButton->setEnabled(false);
     ui->stopButton->setEnabled(false);
+
+    //---- SES AYARLARI ----
 
     // 1- AUDIO DEVICES
 
@@ -24,38 +26,42 @@ MainWindow::MainWindow(QWidget *parent)
     QAudioDevice outputDevice = QMediaDevices::defaultAudioOutput();
 
     if (inputDevice.isNull() || outputDevice.isNull()) {
-        qWarning() << "Ses cihazı bulunamadı...";
-
+        QMessageBox::warning(this, "Hata", "Ses cihazı bulunamadı!");
         ui->recordButton->setEnabled(false);
         ui->stopButton->setEnabled(false);
+        ui->onlineButton->setEnabled(false);
         return;
     }
 
-    // Formatlar
-    QAudioFormat inFormat  = inputDevice.preferredFormat();
-    QAudioFormat outFormat = outputDevice.preferredFormat();
+    // Formatlar - HER İKİ TARAFTA AYNI OLMALI
+    QAudioFormat format;
+    format.setSampleRate(48000);
+    format.setChannelCount(1);
+    format.setSampleFormat(QAudioFormat::Int16);
 
     // Mikrofon ve hoparlör objeleri
-    m_audioSource  = new QAudioSource(inputDevice, inFormat, this);     // 🔹 QAudioSource
-    m_audioOutput  = new QAudioSink(outputDevice, outFormat, this);
+    m_audioSource = new QAudioSource(inputDevice, format, this);
+    m_audioOutput = new QAudioSink(outputDevice, format, this);
 
-    // Hoparlörü hemen başlat, QIODevice elde et
+    // Hoparlörü hemen başlat
     m_outputDevice = m_audioOutput->start();
     if (!m_outputDevice) {
-        qWarning() << "Audio output device başlatılamadı..";
+        qWarning() << "Audio output device başlatılamadı!";
     }
 
     // 2- UDP SOKETİ
-
     m_udpSocket = new QUdpSocket(this);
 
-    // Uygulamanın dinleyeceği port
-    quint16 localPort = 45454;
-    m_udpSocket->bind(QHostAddress::AnyIPv4, localPort);
+    // Sabit bir port kullan (her seferinde aynı port = server'da aynı client)
+    m_localPort = 45000 + (QRandomGenerator::global()->bounded(1000));
+    
+    if (!m_udpSocket->bind(QHostAddress::AnyIPv4, m_localPort)) {
+        // Port kullanımdaysa rastgele port dene
+        m_udpSocket->bind(QHostAddress::AnyIPv4, 0);
+        m_localPort = m_udpSocket->localPort();
+    }
 
-    // Karşı taraf portu (şimdilik kendimiz)
-    m_remoteAddress = QHostAddress("127.0.0.1");
-    m_remotePort    = 45454;
+    qDebug() << "Local UDP port:" << m_localPort;
 
     connect(m_udpSocket, &QUdpSocket::readyRead,
             this, &MainWindow::onUdpReadyRead);
@@ -69,6 +75,11 @@ MainWindow::~MainWindow()
 // Record butonu
 void MainWindow::on_recordButton_clicked()
 {
+    if (!m_isOnline) {
+        qWarning() << "Offline iken konuşamazsın.";
+        return;
+    }
+
     if (m_isStreaming)
         return;
 
@@ -121,7 +132,7 @@ void MainWindow::on_stopButton_clicked()
 // SES -> UDP
 void MainWindow::onAudioReadyRead()
 {
-    if (!m_isStreaming || !m_inputDevice || !m_udpSocket)
+    if (!m_isStreaming || !m_inputDevice || !m_udpSocket || !m_isOnline)
         return;
 
     QByteArray data = m_inputDevice->readAll();
@@ -143,7 +154,7 @@ void MainWindow::onAudioReadyRead()
 // UDP -> SES
 void MainWindow::onUdpReadyRead()
 {
-    if (!m_outputDevice)
+    if (!m_outputDevice || !m_isOnline)
         return;
 
     while (m_udpSocket->hasPendingDatagrams()) {
@@ -155,4 +166,76 @@ void MainWindow::onUdpReadyRead()
         // Gelen ses verisini hoparlöre ver
         m_outputDevice->write(buffer);
     }
+}
+
+void MainWindow::on_onlineButton_clicked()
+{
+    if (!m_isOnline) {
+        // CONNECT
+        QString ipText = ui->serverIpEdit->text().trimmed();
+        
+        if (ipText.isEmpty()) {
+            QMessageBox::warning(this, "Hata", "Server IP adresi girin!");
+            return;
+        }
+
+        QHostAddress serverAddr(ipText);
+        if (serverAddr.isNull()) {
+            QMessageBox::warning(this, "Hata", "Geçersiz IP adresi!");
+            return;
+        }
+
+        m_remoteAddress = serverAddr;
+        m_remotePort = 50000;  // Server portu
+
+        m_isOnline = true;
+        ui->onlineButton->setText("Disconnect");
+        ui->serverIpEdit->setEnabled(false);
+        ui->statusLabel->setText("🟢 Connected to " + ipText);
+        ui->recordButton->setEnabled(true);
+        ui->stopButton->setEnabled(false);
+
+        // Keepalive timer başlat - her 3 saniyede server'a sinyal gönder
+        if (!m_keepAliveTimer) {
+            m_keepAliveTimer = new QTimer(this);
+            connect(m_keepAliveTimer, &QTimer::timeout, this, &MainWindow::sendKeepAlive);
+        }
+        m_keepAliveTimer->start(3000);  // 3 saniye
+        
+        // Hemen bir keepalive gönder (server'a kayıt ol)
+        sendKeepAlive();
+
+        qDebug() << "Connected to server:" << ipText << ":" << m_remotePort;
+
+    } else {
+        // DISCONNECT
+        if (m_isStreaming) {
+            on_stopButton_clicked();
+        }
+
+        // Keepalive timer durdur
+        if (m_keepAliveTimer) {
+            m_keepAliveTimer->stop();
+        }
+
+        m_isOnline = false;
+        ui->onlineButton->setText("Connect");
+        ui->serverIpEdit->setEnabled(true);
+        ui->statusLabel->setText("⚫ Disconnected");
+        ui->recordButton->setEnabled(false);
+        ui->stopButton->setEnabled(false);
+
+        qDebug() << "Disconnected from server";
+    }
+}
+
+// Server'a keepalive paketi gönder (bağlantıyı canlı tut)
+void MainWindow::sendKeepAlive()
+{
+    if (!m_isOnline || !m_udpSocket)
+        return;
+    
+    // Boş bir byte gönder - server bizi aktif olarak görsün
+    QByteArray keepAlive(1, 0);
+    m_udpSocket->writeDatagram(keepAlive, m_remoteAddress, m_remotePort);
 }
