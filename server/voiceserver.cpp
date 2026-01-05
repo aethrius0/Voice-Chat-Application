@@ -22,7 +22,12 @@ void VoiceServer::startReceive(){
         boost::asio::buffer(recvBuffer_),remoteEndpoint_,
         [this](const boost::system::error_code& ec, std::size_t bytesReceived)
         {
-            if(!ec && bytesReceived > 0)
+            if(ec)
+            {
+                //Socket kapatıldıysa sessizce çık
+                return;
+            }
+            if(bytesReceived > 0)
             {
                 handlePacket(bytesReceived);
             }
@@ -53,5 +58,15 @@ void VoiceServer::handlePacket(size_t bytesReceived){
             boost::asio::buffer(recvBuffer_.data(), bytesReceived), c,
             [](auto,auto) {}
             );
+    }
+}
+
+void VoiceServer::stop(){
+    boost::system::error_code ec;
+    socket_.close(ec);
+    if(ec){
+        std::cerr << "[SERVER] Error closing socket: " << ec.message() << "\n";
+    } else {
+        std::cout << "[SERVER] Voice server stopped.\n";
     }
 }

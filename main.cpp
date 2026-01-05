@@ -19,9 +19,16 @@ int main(int argc, char *argv[])
         io.run();
     });
 
-    serverThread.detach(); //GUI kapanırken threadi kapatır.
-
     MainWindow w;
     w.show();
-    return a.exec();
+
+    int result = a.exec(); //GUI kapanana kadar bekle
+
+    //Temiz kapatma
+    server.stop();
+    io.stop();
+    serverThread.join();
+
+
+    return result;
 }
