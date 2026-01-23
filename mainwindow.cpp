@@ -3,6 +3,8 @@
 
 #include <QDebug>
 #include <QMessageBox>
+#include <QNetworkInterface>
+#include <boost/asio.hpp>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -238,4 +240,126 @@ void MainWindow::sendKeepAlive()
     // Boş bir byte gönder - server bizi aktif olarak görsün
     QByteArray keepAlive(1, 0);
     m_udpSocket->writeDatagram(keepAlive, m_remoteAddress, m_remotePort);
+}
+
+// ==================== SERVER FUNCTIONS ====================
+
+void MainWindow::on_hostButton_clicked()
+{
+    if (!m_isHosting) {
+        startServer();
+    } else {
+        stopServer();
+    }
+}
+
+void MainWindow::startServer()
+{
+    // Zaten çalışıyorsa bir şey yapma
+    if (m_isHosting) {
+        return;
+    }
+    
+    // Önce eski kaynakları temizle (varsa)
+    if (m_voiceServer) {
+        m_voiceServer->stop();
+        m_voiceServer.reset();
+    }
+    if (m_ioContext) {
+        m_ioContext->stop();
+        m_ioContext.reset();
+    }
+    if (m_serverThread) {
+        m_serverThread->quit();
+        m_serverThread->wait(1000);
+        delete m_serverThread;
+        m_serverThread = nullptr;
+    }
+    
+    try {
+        // io_context ve server oluştur
+        m_ioContext = std::make_unique<boost::asio::io_context>();
+        m_voiceServer = std::make_unique<VoiceServer>(*m_ioContext, 50000);
+        m_voiceServer->start();
+        
+        // Ayrı thread'de çalıştır
+        m_serverThread = QThread::create([this]() {
+            try {
+                m_ioContext->run();
+            } catch (...) {
+                // Thread içindeki hataları sessizce yakala
+            }
+        });
+        m_serverThread->start();
+        
+        m_isHosting = true;
+        
+        // UI güncelle
+        ui->hostButton->setText("⏹️ Stop Server");
+        ui->hostButton->setStyleSheet("background-color: #f44336; color: white;");
+        
+        QString localIP = getLocalIPAddress();
+        ui->hostStatusLabel->setText("Server: Açık (" + localIP + ":50000)");
+        ui->serverIpEdit->setText("127.0.0.1");  // Otomatik localhost yap
+        
+        qDebug() << "Server started on port 50000";
+        qDebug() << "Local IP:" << localIP;
+        
+    } catch (const std::exception& e) {
+        // Hata olursa temizle
+        m_voiceServer.reset();
+        m_ioContext.reset();
+        m_isHosting = false;
+        
+        QMessageBox::critical(this, "Hata", 
+            QString("Server başlatılamadı!\n\nPort 50000 başka bir uygulama tarafından kullanılıyor olabilir.\n\nDetay: %1").arg(e.what()));
+    }
+}
+
+void MainWindow::stopServer()
+{
+    // Önce client bağlantısını kes
+    if (m_isOnline) {
+        on_onlineButton_clicked();  // Disconnect
+    }
+    
+    // Server'ı durdur
+    if (m_voiceServer) {
+        m_voiceServer->stop();
+    }
+    
+    if (m_ioContext) {
+        m_ioContext->stop();
+    }
+    
+    if (m_serverThread) {
+        m_serverThread->quit();
+        m_serverThread->wait(2000);
+        delete m_serverThread;
+        m_serverThread = nullptr;
+    }
+    
+    m_voiceServer.reset();
+    m_ioContext.reset();
+    
+    m_isHosting = false;
+    
+    // UI güncelle
+    ui->hostButton->setText("🖥️ Host Server");
+    ui->hostButton->setStyleSheet("background-color: #4CAF50; color: white;");
+    ui->hostStatusLabel->setText("Server: Kapalı");
+    
+    qDebug() << "Server stopped";
+}
+
+QString MainWindow::getLocalIPAddress()
+{
+    const QList<QHostAddress> addresses = QNetworkInterface::allAddresses();
+    for (const QHostAddress &address : addresses) {
+        if (address.protocol() == QAbstractSocket::IPv4Protocol 
+            && !address.isLoopback()) {
+            return address.toString();
+        }
+    }
+    return "127.0.0.1";
 }

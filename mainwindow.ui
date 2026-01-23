@@ -16,6 +16,53 @@
   <widget class="QWidget" name="centralwidget">
    <layout class="QVBoxLayout" name="verticalLayout">
     <item>
+     <layout class="QHBoxLayout" name="hostLayout">
+      <item>
+       <widget class="QPushButton" name="hostButton">
+        <property name="minimumSize">
+         <size>
+          <width>150</width>
+          <height>35</height>
+         </size>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>10</pointsize>
+          <bold>true</bold>
+         </font>
+        </property>
+        <property name="text">
+         <string>🖥️ Host Server</string>
+        </property>
+        <property name="styleSheet">
+         <string>background-color: #4CAF50; color: white;</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="hostStatusLabel">
+        <property name="text">
+         <string>Server: Kapalı</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <spacer name="horizontalSpacer">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+       </spacer>
+      </item>
+     </layout>
+    </item>
+    <item>
+     <widget class="Line" name="separator">
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+     </widget>
+    </item>
+    <item>
      <layout class="QHBoxLayout" name="serverLayout">
       <item>
        <widget class="QLabel" name="serverLabel">
@@ -116,7 +163,8 @@
     <item>
      <widget class="QLabel" name="infoLabel">
       <property name="text">
-       <string>Server çalıştıran kişinin IP adresini girin ve Connect'e basın.</string>
+       <string>🖥️ Host Server: Kendi sunucunu aç, arkadaşların sana bağlansın.
+🔌 Connect: Başka birinin sunucusuna bağlan.</string>
       </property>
       <property name="alignment">
        <set>Qt::AlignCenter</set>

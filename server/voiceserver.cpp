@@ -6,10 +6,18 @@ using boost::asio::ip::udp;
 
 
 VoiceServer::VoiceServer(boost::asio::io_context& io, unsigned short port)
-    : socket_(io, udp::endpoint(udp::v4(),port))
+    : socket_(io)  // Socket'i bind etmeden oluştur
 {
+    // Socket'i aç
+    socket_.open(udp::v4());
+    
+    // SO_REUSEADDR ayarla - aynı portu tekrar kullanabilmek için
+    socket_.set_option(boost::asio::socket_base::reuse_address(true));
+    
+    // Şimdi bind et
+    socket_.bind(udp::endpoint(udp::v4(), port));
+    
     std::cout << "[SERVER] Listening UDP on port " << port << "\n";
-
 }
 
 void VoiceServer::start(){
@@ -31,7 +39,7 @@ void VoiceServer::startReceive(){
             {
                 handlePacket(bytesReceived);
             }
-            startReceive();
+            startReceive(); 
         }
 
         );

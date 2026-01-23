@@ -19,6 +19,14 @@
 // IO
 #include <QIODevice>
 
+// SERVER (Thread için)
+#include <QThread>
+#include <memory>
+#include "server/voiceserver.h"
+
+// Boost için forward declaration
+namespace boost { namespace asio { class io_context; } }
+
 QT_BEGIN_NAMESPACE
 namespace Ui {
 class MainWindow;
@@ -42,6 +50,8 @@ private slots:
 
     void on_onlineButton_clicked();
     void sendKeepAlive();
+    
+    void on_hostButton_clicked();  // Host Server butonu
 
 private:
     Ui::MainWindow *ui;
@@ -63,6 +73,16 @@ private:
 
     // KEEPALIVE
     QTimer       *m_keepAliveTimer = nullptr;
+
+    // EMBEDDED SERVER
+    bool                              m_isHosting = false;
+    std::unique_ptr<boost::asio::io_context> m_ioContext;
+    std::unique_ptr<VoiceServer>      m_voiceServer;
+    QThread                          *m_serverThread = nullptr;
+    
+    void startServer();
+    void stopServer();
+    QString getLocalIPAddress();
 
 };
 
