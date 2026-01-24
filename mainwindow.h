@@ -42,8 +42,8 @@ public:
     ~MainWindow();
 
 private slots:
-    void on_recordButton_clicked();
-    void on_stopButton_clicked();
+    void on_micButton_clicked();    // Mikrofon toggle butonu
+    void on_audioButton_clicked();  // Kulaklık toggle butonu
 
     void onUdpReadyRead();   // gelen datagramları okuyacağımız slot
     void onAudioReadyRead(); // mikrofondan yeni ses geldiğinde
@@ -70,6 +70,7 @@ private:
 
     bool          m_isStreaming   = false;
     bool          m_isOnline = false;
+    bool          m_isDeafened = false;  // Kulaklık kapalı mı?
 
     // KEEPALIVE
     QTimer       *m_keepAliveTimer = nullptr;

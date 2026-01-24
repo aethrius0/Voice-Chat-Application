@@ -1,5 +1,6 @@
 #include "mainwindow.h"
 #include "./ui_mainwindow.h"
+#include "config.h"
 
 #include <QDebug>
 #include <QMessageBox>
@@ -12,10 +13,9 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
 
-    // Başlangıçta offline - butonlar disabled
+    // Minimal glassmorphism theme
+    ui->micButton->setEnabled(false);
     m_isOnline = false;
-    ui->recordButton->setEnabled(false);
-    ui->stopButton->setEnabled(false);
 
     //---- SES AYARLARI ----
 
@@ -29,8 +29,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     if (inputDevice.isNull() || outputDevice.isNull()) {
         QMessageBox::warning(this, "Hata", "Ses cihazı bulunamadı!");
-        ui->recordButton->setEnabled(false);
-        ui->stopButton->setEnabled(false);
+        ui->micButton->setEnabled(false);
         ui->onlineButton->setEnabled(false);
         return;
     }
@@ -67,6 +66,13 @@ MainWindow::MainWindow(QWidget *parent)
 
     connect(m_udpSocket, &QUdpSocket::readyRead,
             this, &MainWindow::onUdpReadyRead);
+    
+    // VPS IP'sini otomatik yükle
+    ui->serverIpEdit->setText(VPS_SERVER_IP);
+    
+    // Butonlar başlangıçta disabled
+    ui->micButton->setEnabled(false);
+    ui->audioButton->setEnabled(false);
 }
 
 MainWindow::~MainWindow()
@@ -74,61 +80,122 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-// Record butonu
-void MainWindow::on_recordButton_clicked()
+// Mikrofon toggle butonu (Discord tarzı)
+void MainWindow::on_micButton_clicked()
 {
     if (!m_isOnline) {
-        qWarning() << "Offline iken konuşamazsın.";
+        qWarning() << "Offline iken mikrofon açılamaz.";
         return;
     }
 
-    if (m_isStreaming)
-        return;
+    if (!m_isStreaming) {
+        // MİKROFON AÇ
+        if (!m_audioSource) {
+            qWarning() << "Audio source yok..";
+            return;
+        }
 
-    if (!m_audioSource) {
-        qWarning() << "Audio source yok..";
-        return;
-    }
+        m_inputDevice = m_audioSource->start();
+        if (!m_inputDevice) {
+            qWarning() << "Audio source device başlatılamadı!";
+            return;
+        }
 
-    m_isStreaming = true;
+        connect(m_inputDevice, &QIODevice::readyRead,
+                this, &MainWindow::onAudioReadyRead,
+                Qt::UniqueConnection);
 
-    // Mikrofondan veri almayı başlat
-    m_inputDevice = m_audioSource->start();   // 🔹 QAudioSource::start()
-    if (!m_inputDevice) {
-        qWarning() << "Audio source device başlatılamadı!";
+        m_isStreaming = true;
+        
+        // Mikrofon açık - yeşil
+        ui->micButton->setText("🎤");
+        ui->micButton->setStyleSheet(R"(
+            QPushButton {
+                background-color: #a6e3a1;
+                border-radius: 30px;
+                font-size: 28px;
+            }
+            QPushButton:hover { background-color: #94e2d5; }
+        )");
+        ui->micStatusLabel->setText("Açık");
+        ui->micStatusLabel->setStyleSheet("font-size: 10px; color: #a6e3a1;");
+        
+        qDebug() << "Mikrofon açıldı";
+    } 
+    else {
+        // MİKROFON KAPAT
+        if (m_audioSource) {
+            m_audioSource->stop();
+        }
+        m_inputDevice = nullptr;
         m_isStreaming = false;
-        return;
+        
+        // Mikrofon kapalı
+        ui->micButton->setText("🔇");
+        ui->micButton->setStyleSheet(R"(
+            QPushButton {
+                background-color: #45475a;
+                border-radius: 30px;
+                font-size: 28px;
+            }
+            QPushButton:hover { background-color: #585b70; }
+        )");
+        ui->micStatusLabel->setText("Kapalı");
+        ui->micStatusLabel->setStyleSheet("font-size: 10px; color: #6c7086;");
+        
+        qDebug() << "Mikrofon kapatıldı";
     }
-
-    connect(m_inputDevice, &QIODevice::readyRead,
-            this, &MainWindow::onAudioReadyRead,
-            Qt::UniqueConnection);
-
-    // Buton durumları
-    ui->recordButton->setEnabled(false);
-    ui->stopButton->setEnabled(true);
-
-    qDebug() << "Streaming started..";
 }
 
-// Stop butonu
-void MainWindow::on_stopButton_clicked()
+// Kulaklık toggle butonu (Ses çıkışı aç/kapa)
+void MainWindow::on_audioButton_clicked()
 {
-    if (!m_isStreaming)
+    if (!m_isOnline) {
         return;
-
-    m_isStreaming = false;
-
-    if (m_audioSource) {
-        m_audioSource->stop();   // 🔹 QAudioSource::stop()
     }
 
-    m_inputDevice = nullptr;
-
-    ui->recordButton->setEnabled(true);
-    ui->stopButton->setEnabled(false);
-
-    qDebug() << "Streaming stopped..";
+    if (!m_isDeafened) {
+        // SES KAPAT (Deafen)
+        if (m_audioOutput) {
+            m_audioOutput->suspend();
+        }
+        m_isDeafened = true;
+        
+        ui->audioButton->setText("🔇");
+        ui->audioButton->setStyleSheet(R"(
+            QPushButton {
+                background-color: #f38ba8;
+                border-radius: 30px;
+                font-size: 28px;
+            }
+            QPushButton:hover { background-color: #eba0ac; }
+        )");
+        ui->audioStatusLabel->setText("Kapalı");
+        ui->audioStatusLabel->setStyleSheet("font-size: 10px; color: #f38ba8;");
+        
+        qDebug() << "Ses çıkışı kapatıldı (Deafened)";
+    } 
+    else {
+        // SES AÇ
+        if (m_audioOutput) {
+            m_audioOutput->resume();
+        }
+        m_isDeafened = false;
+        
+        ui->audioButton->setText("🎧");
+        ui->audioButton->setStyleSheet(R"(
+            QPushButton {
+                background-color: #a6e3a1;
+                border-radius: 30px;
+                font-size: 28px;
+            }
+            QPushButton:hover { background-color: #94e2d5; }
+        )");
+        ui->audioStatusLabel->setText("Açık");
+        ui->audioStatusLabel->setStyleSheet("font-size: 10px; color: #a6e3a1;");
+        
+        qDebug() << "Ses çıkışı açıldı";
+    }
 }
 
 // SES -> UDP
@@ -165,8 +232,10 @@ void MainWindow::onUdpReadyRead()
 
         m_udpSocket->readDatagram(buffer.data(), buffer.size());
 
-        // Gelen ses verisini hoparlöre ver
-        m_outputDevice->write(buffer);
+        // Deafen modunda ses çıkışı yapma
+        if (!m_isDeafened) {
+            m_outputDevice->write(buffer);
+        }
     }
 }
 
@@ -191,41 +260,104 @@ void MainWindow::on_onlineButton_clicked()
         m_remotePort = 50000;  // Server portu
 
         m_isOnline = true;
-        ui->onlineButton->setText("Disconnect");
+        
+        // Bağlı stili
+        ui->onlineButton->setText("Çık");
+        ui->onlineButton->setStyleSheet(R"(
+            QPushButton {
+                background-color: #f38ba8;
+                color: #1e1e2e;
+                font-size: 12px;
+            }
+            QPushButton:hover { background-color: #eba0ac; }
+        )");
         ui->serverIpEdit->setEnabled(false);
-        ui->statusLabel->setText("🟢 Connected to " + ipText);
-        ui->recordButton->setEnabled(true);
-        ui->stopButton->setEnabled(false);
+        ui->statusLabel->setText("● " + ipText);
+        ui->statusLabel->setStyleSheet("font-size: 12px; color: #a6e3a1;");
+        
+        // Mikrofon ve kulaklık butonlarını aktif et
+        ui->micButton->setEnabled(true);
+        ui->audioButton->setEnabled(true);
+        
+        // Mikrofonu otomatik aç
+        on_micButton_clicked();
+        
+        // Kulaklık başlangıçta açık
+        ui->audioButton->setText("🎧");
+        ui->audioButton->setStyleSheet(R"(
+            QPushButton {
+                background-color: #a6e3a1;
+                border-radius: 30px;
+                font-size: 28px;
+            }
+            QPushButton:hover { background-color: #94e2d5; }
+        )");
+        ui->audioStatusLabel->setText("Açık");
+        ui->audioStatusLabel->setStyleSheet("font-size: 10px; color: #a6e3a1;");
 
-        // Keepalive timer başlat - her 3 saniyede server'a sinyal gönder
+        // Keepalive timer başlat
         if (!m_keepAliveTimer) {
             m_keepAliveTimer = new QTimer(this);
             connect(m_keepAliveTimer, &QTimer::timeout, this, &MainWindow::sendKeepAlive);
         }
-        m_keepAliveTimer->start(3000);  // 3 saniye
-        
-        // Hemen bir keepalive gönder (server'a kayıt ol)
+        m_keepAliveTimer->start(3000);
         sendKeepAlive();
 
         qDebug() << "Connected to server:" << ipText << ":" << m_remotePort;
 
     } else {
         // DISCONNECT
+        
         if (m_isStreaming) {
-            on_stopButton_clicked();
+            on_micButton_clicked();
         }
 
-        // Keepalive timer durdur
         if (m_keepAliveTimer) {
             m_keepAliveTimer->stop();
         }
 
         m_isOnline = false;
-        ui->onlineButton->setText("Connect");
+        m_isDeafened = false;
+        
+        // Çevrimdışı stili
+        ui->onlineButton->setText("Bağlan");
+        ui->onlineButton->setStyleSheet(R"(
+            QPushButton {
+                background-color: #a6e3a1;
+                color: #1e1e2e;
+                font-size: 12px;
+            }
+            QPushButton:hover { background-color: #94e2d5; }
+        )");
         ui->serverIpEdit->setEnabled(true);
-        ui->statusLabel->setText("⚫ Disconnected");
-        ui->recordButton->setEnabled(false);
-        ui->stopButton->setEnabled(false);
+        ui->statusLabel->setText("● Çevrimdışı");
+        ui->statusLabel->setStyleSheet("font-size: 12px; color: #f38ba8;");
+        
+        // Mikrofon butonunu deaktif et
+        ui->micButton->setEnabled(false);
+        ui->micButton->setText("🎤");
+        ui->micButton->setStyleSheet(R"(
+            QPushButton {
+                background-color: #313244;
+                border-radius: 30px;
+                font-size: 28px;
+            }
+            QPushButton:disabled { background-color: #313244; }
+        )");
+        ui->micStatusLabel->setText("");
+        
+        // Kulaklık butonunu deaktif et
+        ui->audioButton->setEnabled(false);
+        ui->audioButton->setText("🎧");
+        ui->audioButton->setStyleSheet(R"(
+            QPushButton {
+                background-color: #313244;
+                border-radius: 30px;
+                font-size: 28px;
+            }
+            QPushButton:disabled { background-color: #313244; }
+        )");
+        ui->audioStatusLabel->setText("");
 
         qDebug() << "Disconnected from server";
     }
@@ -287,26 +419,33 @@ void MainWindow::startServer()
             try {
                 m_ioContext->run();
             } catch (...) {
-                // Thread içindeki hataları sessizce yakala
             }
         });
         m_serverThread->start();
         
         m_isHosting = true;
         
-        // UI güncelle
-        ui->hostButton->setText("⏹️ Stop Server");
-        ui->hostButton->setStyleSheet("background-color: #f44336; color: white;");
+        // Sunucu açık stili
+        ui->hostButton->setText("Durdur");
+        ui->hostButton->setStyleSheet(R"(
+            QPushButton {
+                background-color: #f38ba8;
+                color: #1e1e2e;
+                font-size: 11px;
+                border-radius: 6px;
+            }
+            QPushButton:hover { background-color: #eba0ac; }
+        )");
         
         QString localIP = getLocalIPAddress();
-        ui->hostStatusLabel->setText("Server: Açık (" + localIP + ":50000)");
-        ui->serverIpEdit->setText("127.0.0.1");  // Otomatik localhost yap
+        ui->hostStatusLabel->setText(localIP + ":50000");
+        ui->hostStatusLabel->setStyleSheet("font-size: 10px; color: #a6e3a1;");
+        ui->serverIpEdit->setText("127.0.0.1");
         
         qDebug() << "Server started on port 50000";
         qDebug() << "Local IP:" << localIP;
         
     } catch (const std::exception& e) {
-        // Hata olursa temizle
         m_voiceServer.reset();
         m_ioContext.reset();
         m_isHosting = false;
@@ -344,10 +483,19 @@ void MainWindow::stopServer()
     
     m_isHosting = false;
     
-    // UI güncelle
-    ui->hostButton->setText("🖥️ Host Server");
-    ui->hostButton->setStyleSheet("background-color: #4CAF50; color: white;");
-    ui->hostStatusLabel->setText("Server: Kapalı");
+    // Sunucu kapalı stili
+    ui->hostButton->setText("Başlat");
+    ui->hostButton->setStyleSheet(R"(
+        QPushButton {
+            background-color: #45475a;
+            color: #cdd6f4;
+            font-size: 11px;
+            border-radius: 6px;
+        }
+        QPushButton:hover { background-color: #585b70; }
+    )");
+    ui->hostStatusLabel->setText("Kapalı");
+    ui->hostStatusLabel->setStyleSheet("font-size: 10px; color: #6c7086;");
     
     qDebug() << "Server stopped";
 }
